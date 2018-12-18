@@ -8,7 +8,7 @@ RUN set -x \
     && apt-get update && apt-get install -y wget vim telnet ntp \
     && update-rc.d ntp defaults
 
-ARG MIRROE=www-us.apache.org
+ARG MIRROR=www-us.apache.org
 
 # Installing Kylin
 ARG KYLIN_VERSION=2.5.2
