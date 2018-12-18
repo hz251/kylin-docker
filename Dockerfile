@@ -10,6 +10,47 @@ RUN set -x \
 
 ARG MIRROR=www-us.apache.org
 
+# Installing Hadoop
+ARG HADOOP_VERSION=2.9.2
+# COPY hadoop-${HADOOP_VERSION}.tar.gz .
+RUN set -x \
+    && wget -q https://${MIRROR}/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
+    && tar -xzvf hadoop-${HADOOP_VERSION}.tar.gz -C /usr/local/ \
+    && mv /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop
+ENV HADOOP_HOME=/usr/local/hadoop
+ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+ENV YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
+
+# Installing Spark
+ARG SPARK_VERSION=2.4.0
+# COPY spark-${SPARK_VERSION}-bin-without-hadoop.tgz .
+RUN set -x \
+    && wget -q https://${MIRROR}/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-without-hadoop.tgz \
+    && tar -xzvf spark-${SPARK_VERSION}-bin-without-hadoop.tgz -C /usr/local/ \
+    && mv /usr/local/spark-${SPARK_VERSION}-bin-without-hadoop /usr/local/spark
+ENV SPARK_HOME=/usr/local/spark
+ENV LD_LIBRARY_PATH=$HADOOP_HOME/lib/native/:$LD_LIBRARY_PATH
+
+# Installing Hive
+ARG HIVE_VERSION=3.1.1
+# COPY apache-hive-${HIVE_VERSION}-bin.tar.gz .
+RUN set -x \
+    && wget -q https://${MIRROR}/dist/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz \
+    && tar -xzvf apache-hive-${HIVE_VERSION}-bin.tar.gz -C /usr/local/ \
+    && mv /usr/local/apache-hive-${HIVE_VERSION}-bin /usr/local/hive
+ENV HIVE_HOME=/usr/local/hive
+ENV HCAT_HOME=$HIVE_HOME/hcatalog
+ENV HIVE_CONF=$HIVE_HOME/con
+
+# Installing HBase
+ARG HBASE_VERSION=2.1.1
+# COPY hbase-${HBASE_VERSION}-bin.tar.gz .
+RUN set -x \
+    && wget -q https://${MIRROR}/dist/hbase/${HBASE_VERSION}/hbase-${HBASE_VERSION}-bin.tar.gz \
+    && tar -xzvf hbase-${HBASE_VERSION}-bin.tar.gz -C /usr/local/ \
+    && mv /usr/local/hbase-${HBASE_VERSION} /usr/local/hbase
+ENV HBASE_HOME=/usr/local/hbase
+
 # Installing Kylin
 ARG KYLIN_VERSION=2.5.2
 # COPY apache-kylin-${KYLIN_VERSION}-bin-hbase1x.tar.gz .
@@ -20,7 +61,16 @@ RUN set -x \
 ENV KYLIN_HOME=/usr/local/kylin
 
 # Setting the PATH environment variable
-ENV PATH=$PATH:$JAVA_HOME/bin:$KYLIN_HOME/bin
+ENV PATH=$PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$SPARK_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$KYLIN_HOME/bin
+
+COPY client-conf/core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
+COPY client-conf/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+COPY client-conf/mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml
+COPY client-conf/yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml
+COPY client-conf/hbase-site.xml $HBASE_HOME/conf/hbase-site.xml
+COPY client-conf/hdfs-site.xml $HBASE_HOME/conf/hdfs-site.xml
+COPY client-conf/hive-site.xml $HIVE_HOME/conf/hive-site.xml
+COPY client-conf/mapred-site.xml $HIVE_HOME/conf/mapred-site.xml
 
 # Cleanup
 RUN rm -rf /tmp/*
