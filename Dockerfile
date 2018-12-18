@@ -8,13 +8,13 @@ RUN set -x \
     && apt-get update && apt-get install -y wget vim telnet ntp \
     && update-rc.d ntp defaults
 
-ARG MIRROR=mirror.bit.edu.cn
+ARG MIRROE=www-us.apache.org
 
 # Installing Kylin
-ARG KYLIN_VERSION=2.2.0
+ARG KYLIN_VERSION=2.5.2
 # COPY apache-kylin-${KYLIN_VERSION}-bin-hbase1x.tar.gz .
 RUN set -x \
-    && wget -q http://${MIRROR}/apache/kylin/apache-kylin-${KYLIN_VERSION}/apache-kylin-${KYLIN_VERSION}-bin-hbase1x.tar.gz \
+    && wget -q https://${MIRROR}/dist/kylin/apache-kylin-${KYLIN_VERSION}/apache-kylin-${KYLIN_VERSION}-bin-hbase1x.tar.gz \
     && tar -xzvf apache-kylin-${KYLIN_VERSION}-bin-hbase1x.tar.gz -C /usr/local/ \
     && mv /usr/local/apache-kylin-${KYLIN_VERSION}-bin /usr/local/kylin
 ENV KYLIN_HOME=/usr/local/kylin
