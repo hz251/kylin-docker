@@ -16,7 +16,7 @@ ARG KYLIN_VERSION=2.5.2
 RUN set -x \
     && wget -q https://${MIRROR}/dist/kylin/apache-kylin-${KYLIN_VERSION}/apache-kylin-${KYLIN_VERSION}-bin-hbase1x.tar.gz \
     && tar -xzvf apache-kylin-${KYLIN_VERSION}-bin-hbase1x.tar.gz -C /usr/local/ \
-    && mv /usr/local/apache-kylin-${KYLIN_VERSION}-bin /usr/local/kylin
+    && mv /usr/local/apache-kylin-${KYLIN_VERSION}-bin-hbase1x /usr/local/kylin
 ENV KYLIN_HOME=/usr/local/kylin
 
 # Setting the PATH environment variable
